@@ -28,4 +28,5 @@ BoundingBox Triangle::getBoundingBox(const std::vector<Model::Vertex> &vertices)
 }
 HitResult Triangle::getIntersection(const Ray &ray)
 {
+    return HitResult();
 }

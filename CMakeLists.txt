@@ -11,7 +11,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 include_directories(thirdparty)
 
-aux_source_directory(. DIR_SRCS)
+aux_source_directory(./src DIR_SRCS)
 
 
 add_executable(RayTracing ${DIR_SRCS})
