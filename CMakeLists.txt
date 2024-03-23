@@ -9,13 +9,11 @@ set(NAME RayTracing)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-include_directories(thirdparty)
+include_directories(src thirdparty)
 
-aux_source_directory(./src DIR_SRCS)
+file(GLOB SOURCES "src/*.cpp")
 
-
-add_executable(RayTracing ${DIR_SRCS})
-
+add_executable(RayTracing main.cpp ${SOURCES})
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
