@@ -1,6 +1,9 @@
 #ifndef __MODEL_H__
 #define __MODEL_H__
 
+#include "geometry.hpp"
+
+// thirdparty
 #include <glm/glm.hpp>
 
 // std
@@ -10,29 +13,13 @@
 class Model
 {
 public:
-    struct Vertex
-    {
-        glm::vec3 position{};
-        glm::vec3 color{};
-        glm::vec3 normal{};
-        glm::vec2 uv{};
-
-        bool operator==(const Vertex &v) const
-        {
-            return position == v.position &&
-                   color == v.color &&
-                   normal == v.normal &&
-                   uv == v.uv;
-        }
-    };
-
     Model() = default;
     Model(const std::string &modelPath);
 
     ~Model() = default;
 
     uint32_t getIndicesCount() { return indices.size(); }
-    Model::Vertex &getVertex(uint32_t idx);
+    void getTriangles(std::vector<Triangle> &triangles);
 
 private:
     void loadModel(const std::string &modelPath);

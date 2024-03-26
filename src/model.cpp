@@ -21,9 +21,9 @@ namespace std
         (int[]){0, (hashCombine(seed, std::forward<Rest>(rest)), 0)...};
     }
     template <>
-    struct hash<Model::Vertex>
+    struct hash<Vertex>
     {
-        size_t operator()(Model::Vertex const &vertex) const noexcept
+        size_t operator()(Vertex const &vertex) const noexcept
         {
             size_t seed = 0;
             hashCombine(seed, vertex.position, vertex.color, vertex.normal, vertex.uv);
@@ -119,8 +119,16 @@ void Model::loadModel(const std::string &modelPath)
             indexOffset += fv;
         }
     }
+    std::cout << "Indices: " << indices.size() << std::endl;
 }
-Model::Vertex &Model::getVertex(uint32_t idx)
+
+void Model::getTriangles(std::vector<Triangle> &triangles)
 {
-    return vertices[idx];
+    triangles.clear();
+
+    for (uint32_t idx = 0; idx < indices.size(); idx += 3)
+    {
+        Triangle tmp{vertices[indices[idx]], vertices[indices[idx + 1]], vertices[indices[idx + 2]]};
+        triangles.push_back(tmp);
+    }
 }

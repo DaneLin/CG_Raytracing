@@ -5,9 +5,10 @@
 
 struct HitResult
 {
-    float hitDistance;
-    glm::vec3 hitWorldNormal;
-    glm::vec3 hitWorldPosition;
+    bool isHit = false;
+    float hitTime = std::numeric_limits<float>::max();
+    glm::vec3 hitWorldNormal{};
+    glm::vec3 hitWorldPosition{};
 };
 
 struct Ray

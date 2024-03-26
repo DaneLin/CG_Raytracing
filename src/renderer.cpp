@@ -1,24 +1,42 @@
 #include "renderer.hpp"
+#include "bvh.cpp"
 
 // std
 #include <iostream>
 #include <fstream>
+#include <execution>
+#include <omp.h>
 
-glm::vec3 convertToRGB(const glm::vec3 &color)
+glm::vec3 Renderer::convertToRGB(const glm::vec3 &color)
 {
-    return {color.r * 255.f, color.g * 255.f, color.b * 255.f};
+    float scale = 1.f / (float)m_Camera->getSampleCount();
+    auto r = color.r * scale * 255.f;
+    auto g = color.g * scale * 255.f;
+    auto b = color.b * scale * 255.f;
+
+    return {(uint32_t)r, (uint32_t)g, (uint32_t)b};
 }
 
-void Renderer::render(const Camera &camera)
+void Renderer::render(Camera &camera, Scene &scene)
 {
     m_Camera = &camera;
+    m_Scene = &scene;
+    m_Scene->getBVHTreeRoot();
     setup();
     float aspectRatio = (float)m_ImageWidth / (float)m_ImageHeight;
+    uint32_t sampleCount = m_Camera->getSampleCount();
+#pragma omp parallel
     for (uint32_t y = 0; y < m_ImageHeight; ++y)
     {
+#pragma omp parallel
         for (uint32_t x = 0; x < m_ImageWidth; ++x)
         {
-            m_PixelData[x + y * m_ImageWidth] = convertToRGB(pixelResult(x, y));
+            glm::vec3 color{};
+            for (uint32_t spp = 0; spp < sampleCount; ++spp)
+            {
+                color += pixelResult(x, y);
+            }
+            m_PixelData[x + y * m_ImageWidth] = convertToRGB(color);
         }
     }
     generateImage();
@@ -71,27 +89,52 @@ void Renderer::generateImage()
 
 glm::vec3 Renderer::pixelResult(uint32_t x, uint32_t y)
 {
-    Ray ray(m_Camera->getPosition(), m_Camera->getRayDirections()[x + y * m_ImageWidth]);
+    Ray ray = m_Camera->getRay(x, y);
 
-    glm::vec3 light{0.f, 1.f, 0.f};
+    glm::vec3 light = m_Camera->getPosition();
+    // light = glm::normalize(light);
 
-    float radius = 0.5f;
+    // float radius = 0.5f;
 
-    float a = glm::dot(ray.direction, ray.direction);
-    float b = 2.f * glm::dot(ray.origin, ray.direction);
-    float c = glm::dot(ray.origin, ray.origin) - radius * radius;
+    // float a = glm::dot(ray.direction, ray.direction);
+    // float b = 2.f * glm::dot(ray.origin, ray.direction);
+    // float c = glm::dot(ray.origin, ray.origin) - radius * radius;
 
-    float discriminant = b * b - 4.f * a * c;
-    if (discriminant > 0.0f)
+    // float discriminant = b * b - 4.f * a * c;
+    // if (discriminant > 0.0f)
+    // {
+    //     discriminant = std::sqrt(discriminant);
+    //     float closestT = (-b - discriminant) / (2.f * a);
+
+    //     glm::vec3 hitPoint = ray.origin + ray.direction * closestT;
+    //     glm::vec3 hitNormal = glm::normalize(hitPoint);
+
+    //     float intensity = std::max(0.f, glm::dot(hitNormal, light));
+    //     return glm::vec3(1, 0, 1) * intensity;
+    // }
+    auto &meshes = m_Scene->getGeometries();
+
+    HitResult hitResult;
+    auto node = m_Scene->getBVHTreeRoot();
+    float hitTime = std::numeric_limits<float>::max();
+    if (intersectRayBVH(ray, node, hitResult, hitTime))
     {
-        discriminant = std::sqrt(discriminant);
-        float closestT = (-b - discriminant) / (2.f * a);
-
-        glm::vec3 hitPoint = ray.origin + ray.direction * closestT;
-        glm::vec3 hitNormal = glm::normalize(hitPoint);
-
-        float intensity = std::max(0.f, glm::dot(hitNormal, light));
-        return glm::vec3(1, 0, 1) * intensity;
+        float intensity = glm::dot(glm::normalize(hitResult.hitWorldNormal), glm::normalize(light - hitResult.hitWorldPosition));
+        return glm::vec3(1, 0, 1) * std::max(0.f, intensity);
     }
+    // for (auto mesh : meshes)
+    // {
+    //     HitResult hitResult = mesh.getIntersection(ray);
+    //     if (hitResult.isHit)
+    //     {
+    //         glm::vec3 hitPoint = ray.origin + ray.direction * hitResult.hitTime;
+    //         glm::vec3 normal = hitResult.hitWorldNormal;
+    //         if (glm::dot(normal, -light) < 0)
+    //             normal = -normal;
+
+    //         return glm::vec3(1, 0, 1) * std::max(0.f, glm::dot(glm::normalize(normal), -light));
+    //     }
+    // }
+
     return {0, 0, 0};
 }

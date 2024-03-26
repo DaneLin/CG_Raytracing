@@ -3,16 +3,19 @@
 
 #include <glm/glm.hpp>
 
+#include "ray.hpp"
+
 // std
 #include <vector>
+#include <string>
 
 class Camera
 {
 public:
     Camera(float fvoy, float near, float far, uint32_t width, uint32_t height);
-
+    Camera(const std::string &filepath);
     void setViewTarget(glm::vec3 cameraPosition, glm::vec3 targetCenter, glm::vec3 upDiection);
-
+    void setSamplePerPixel(uint32_t spp) { samplePerPixel = spp; }
     const float getWidth() const { return imageWidth; }
     const float getHeight() const { return imageHeight; }
     const glm::vec3 &getPosition() const { return position; }
@@ -21,20 +24,22 @@ public:
     const glm::mat4 &getProjection() const { return projection; }
     const glm::mat4 &getInverseProjection() const { return inversePorejction; }
 
-    const std::vector<glm::vec3> &getRayDirections() const { return rayDirections; }
+    Ray getRay(uint32_t i, uint32_t j);
+    uint32_t getSampleCount() const { return samplePerPixel; }
 
 private:
-    void calcProjection();
-    void calcView();
-    void calcRayDirections();
+    void initialize();
+    glm::vec3 uniformSampleSquare();
 
 private:
     glm::vec3 position{};
     glm::vec3 lookAt{};
     glm::vec3 upDirection{};
 
+    float focusDis = 1.f;
     float fvoy;
     float zNear, zFar;
+    uint32_t samplePerPixel = 1;
     uint32_t imageWidth, imageHeight;
 
     glm::mat4 view{1.f};
@@ -43,6 +48,10 @@ private:
     glm::mat4 inversePorejction{1.f};
 
     std::vector<glm::vec3> rayDirections;
+
+    glm::vec3 delta_u{};
+    glm::vec3 delta_v{};
+    glm::vec3 pixelZeroLoc{};
 };
 
 #endif // __CAMERA_H__
