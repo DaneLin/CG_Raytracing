@@ -14,7 +14,8 @@ class Renderer
 {
 public:
     Renderer() = default;
-    void render(Camera &camera, Scene &scene);
+    Renderer(Camera &camera, Scene &scene);
+    void render();
 
 private:
     void setup();

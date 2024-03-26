@@ -17,13 +17,13 @@ int main(int, char **)
     Camera camera("../models/cornell-box/cornell-box.xml");
     camera.setSamplePerPixel(1);
 
-    Model model("../models/cornell-box/cornell-box.obj");
+    Model model("../models/cornell-box/leftwall.obj");
 
     std::vector<Triangle> triangles;
     model.getTriangles(triangles);
     Scene scene(triangles);
-    Renderer renderer;
-    renderer.render(camera, scene);
+    Renderer renderer(camera, scene);
+    renderer.render();
 
     return 0;
 }
