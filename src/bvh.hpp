@@ -37,9 +37,9 @@ struct BVHNode
         return leftNode == nullptr && rightNode == nullptr;
     }
 
-    bool isHit(const Ray &ray, double &time) const
+    bool isHit(const Ray &ray) const
     {
-        return boundingBox.intersect(ray, time);
+        return boundingBox.intersect(ray);
     }
 };
 

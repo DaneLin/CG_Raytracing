@@ -16,7 +16,7 @@
 int main(int, char **)
 {
     Camera camera("../models/cornell-box/cornell-box.xml");
-    camera.setSamplePerPixel(100);
+    camera.setSamplePerPixel(10);
 
     Model model("../models/vikingroom/leftwall.obj");
 
