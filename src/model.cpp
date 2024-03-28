@@ -1,35 +1,10 @@
 #include "model.hpp"
 
-#define GLM_ENABLE_EXPERIMENTAL
-#include <glm/gtx/hash.hpp>
-
 // std
 #include <iostream>
 #include <unordered_map>
 #include <functional>
 #include <cstring>
-
-namespace std
-{
-    // from: https://stackoverflow.com/a/57595105
-    template <typename T, typename... Rest>
-    inline void hashCombine(std::size_t &seed, T const &v, Rest &&...rest)
-    {
-        std::hash<T> hasher;
-        seed ^= hasher(v) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
-        (int[]){0, (hashCombine(seed, std::forward<Rest>(rest)), 0)...};
-    }
-    template <>
-    struct hash<Vertex>
-    {
-        size_t operator()(Vertex const &vertex) const noexcept
-        {
-            size_t seed = 0;
-            hashCombine(seed, vertex.position, vertex.color, vertex.normal, vertex.uv);
-            return seed;
-        }
-    };
-}
 
 Model::Model(const std::string &modelPath)
 {
@@ -59,8 +34,6 @@ void Model::loadModel(const std::string &modelPath)
 
     vertices.clear();
     indices.clear();
-
-    std::unordered_map<Vertex, uint32_t> uniqueVertices{};
 
     // loop over shapes
     for (size_t s = 0; s < shapes.size(); ++s)
@@ -106,12 +79,9 @@ void Model::loadModel(const std::string &modelPath)
                     vertex.uv.y = attrib.texcoords[2 * size_t(idx.texcoord_index) + 1];
                 }
 
-                if (uniqueVertices.count(vertex) == 0)
-                {
-                    uniqueVertices[vertex] = static_cast<uint32_t>(vertices.size());
-                    vertices.emplace_back(vertex);
-                }
-                indices.emplace_back(uniqueVertices[vertex]);
+                vertices.emplace_back(vertex);
+
+                indices.emplace_back(vertices.size());
             }
             indexOffset += fv;
         }

@@ -54,8 +54,9 @@ struct BoundingBox
         }
     }
 
-    bool intersect(const Ray &ray) const
+    bool intersect(const Ray &ray, double &time) const
     {
+        time = std::numeric_limits<double>::max();
         float tmin = (vMin.x - ray.origin.x) / ray.direction.x;
         float tmax = (vMax.x - ray.origin.x) / ray.direction.x;
 
@@ -70,6 +71,10 @@ struct BoundingBox
 
         if ((tmin > tymax) || (tmax < tymin))
             return false;
+        if (tymin > tmin)
+            tmin = tymin;
+        if (tymax < tmax)
+            tmax = tymax;
         // float tzmin = (vMin.z - ray.origin.z) / ray.direction.z;
         // float tzmax = (vMax.z - ray.origin.z) / ray.direction.z;
 
@@ -78,7 +83,7 @@ struct BoundingBox
 
         // if ((tmin > tzmax) || (tzmin > tmax))
         //     return false;
-
+        time = std::max(0.f, tmin);
         return true;
     }
 };

@@ -3,9 +3,12 @@
 
 static bool intersectRayBVH(const Ray &ray, const BVHNode *node, HitResult &hitResult, float &time)
 {
-    if (!node->isHit(ray))
+    double tmp;
+    if (!node->isHit(ray, tmp))
         return false;
     bool isHit = false;
+    if (tmp > time)
+        return false;
     if (node->leftNode == nullptr && node->rightNode == nullptr)
     {
         for (auto triangle : node->triangles)
