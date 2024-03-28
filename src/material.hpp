@@ -18,6 +18,7 @@ public:
 
     virtual bool scatter(const Ray &ray, const HitResult &hitResult, ScatteredResult &scatterResult, float &pdf) const
     {
+        pdf = 0;
         return false;
     }
 

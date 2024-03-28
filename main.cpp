@@ -18,7 +18,7 @@ int main(int, char **)
     Camera camera("../models/cornell-box/cornell-box.xml");
     camera.setSamplePerPixel(100);
 
-    Model model("../models/cornell-box/cornell-box.obj");
+    Model model("../models/vikingroom/leftwall.obj");
 
     std::vector<Triangle> triangles;
     model.getTriangles(triangles);

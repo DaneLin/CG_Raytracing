@@ -98,12 +98,12 @@ glm::vec3 Renderer::traceRay(const Ray &ray, int depth)
     }
     ScatteredResult scatteredResult;
     auto emissive = m_Scene->getMaterials()[hitResult.faceMaterialID]->emit(ray, hitResult, hitResult.hitUV.x, hitResult.hitUV.y);
-    glm::vec3 collection{};
+    glm::vec3 collection{0.f};
     float pdf;
     if (m_Scene->getMaterials()[hitResult.faceMaterialID]->scatter(ray, hitResult, scatteredResult, pdf))
     {
         auto scatterPDF = m_Scene->getMaterials()[hitResult.faceMaterialID]->scatterPDF(ray, hitResult, scatteredResult.rayOut);
-        collection = scatteredResult.attenuation * scatterPDF * traceRay(scatteredResult.rayOut, depth - 1) * (1.f / pdf);
+        collection = scatteredResult.attenuation * scatterPDF * traceRay(scatteredResult.rayOut, depth - 1) / pdf;
     }
     return emissive + collection;
 }
