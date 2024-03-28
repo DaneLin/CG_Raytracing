@@ -16,7 +16,7 @@
 int main(int, char **)
 {
     Camera camera("../models/cornell-box/cornell-box.xml");
-    camera.setSamplePerPixel(10);
+    camera.setSamplePerPixel(1000);
 
     Model model("../models/vikingroom/leftwall.obj");
 
@@ -24,7 +24,7 @@ int main(int, char **)
     model.getTriangles(triangles);
     Scene scene(triangles, model.getMaterials());
     Renderer renderer(camera, scene);
-    renderer.setBoudingTime(50);
+    renderer.setBoudingTime(5);
     renderer.render();
 
     return 0;
