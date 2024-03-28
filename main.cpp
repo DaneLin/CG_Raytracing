@@ -15,11 +15,11 @@
 
 int main(int, char **)
 {
-    Camera camera("../models/cornell-box/cornell-box.xml");
-    camera.setSamplePerPixel(1000);
+    Camera camera("../models/veach-mis/veach-mis.xml");
+    camera.setSamplePerPixel(10);
 
-    Model model("../models/vikingroom/leftwall.obj");
-
+    Model model("../models/veach-mis/veach-mis.obj");
+    model.loadMaterials(camera.getLights());
     std::vector<Triangle> triangles;
     model.getTriangles(triangles);
     Scene scene(triangles, model.getMaterials());

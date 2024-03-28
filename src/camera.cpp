@@ -9,6 +9,7 @@
 #include <random>
 #include <iostream>
 #include <exception>
+#include <sstream>
 
 Camera::Camera(float fvoy, float near, float far, uint32_t width, uint32_t height)
     : fvoy(fvoy), zNear(near), zFar(far), imageWidth(width), imageHeight(height)
@@ -66,11 +67,21 @@ Camera::Camera(const std::string &filepath)
     {
         const char *mtlname = pLight->Attribute("mtlname");
         const char *radiance = pLight->Attribute("radiance");
-        std::cout << mtlname << ' ' << radiance << std::endl;
+        glm::vec3 tmp{};
+        std::stringstream ss(radiance);
+        char delim;
+        ss >> tmp.x >> delim >> tmp.y >> delim >> tmp.z;
+        lights.push_back(tmp);
+        // std::cout << tmp.x << ' ' << tmp.y << ' ' << tmp.z << std::endl;
         lightCount--;
         pLight = pLight->NextSiblingElement();
     }
     initialize();
+}
+
+std::vector<glm::vec3> Camera::getLights() const
+{
+    return lights;
 }
 
 void Camera::setViewTarget(glm::vec3 cameraPosition, glm::vec3 targetCenter, glm::vec3 upDiection)

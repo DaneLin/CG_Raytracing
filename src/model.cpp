@@ -25,7 +25,6 @@ namespace std
 Model::Model(const std::string &modelPath)
 {
     loadModel(modelPath);
-    loadMaterials();
 }
 
 void Model::loadModel(const std::string &modelPath)
@@ -108,10 +107,9 @@ void Model::loadModel(const std::string &modelPath)
     std::cout << "Indices: " << indices.size() << std::endl;
 }
 
-void Model::loadMaterials()
+void Model::loadMaterials(const std::vector<glm::vec3> &lights)
 {
     auto &mats = reader.GetMaterials();
-
     std::cout << "Materials: " << mats.size() << '\n';
     materials.clear();
     materials.resize(mats.size());
@@ -126,10 +124,21 @@ void Model::loadMaterials()
         // solid color
         if (mats[i].diffuse_texname.length() == 0)
         {
-            if (std::strncmp(mats[i].name.c_str(), "Light", 5) == 0)
+            if (std::strncmp(mats[i].name.c_str(), "light", 5) == 0 || std::strncmp(mats[i].name.c_str(), "Light", 5) == 0)
             {
-                materials[i] = std::make_shared<LightSource>(glm::vec3{32, 24, 8});
+                int idx = 1;
+                if (std::strlen(mats[i].name.c_str()) > 5)
+                {
+                    idx = mats[i].name.back() - '0';
+                }
+
+                materials[i] = std::make_shared<LightSource>(lights[idx - 1]);
                 std::cout << "made a light source material!" << '\n';
+            }
+            else if (std::strncmp(mats[i].name.c_str(), "Mirror", 6) == 0)
+            {
+                materials[i] = std::make_shared<Mirror>();
+                std::cout << "made a Miroor material!" << '\n';
             }
             else
             {

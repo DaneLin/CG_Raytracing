@@ -24,6 +24,8 @@ public:
     const glm::mat4 &getProjection() const { return projection; }
     const glm::mat4 &getInverseProjection() const { return inversePorejction; }
 
+    std::vector<glm::vec3> getLights() const;
+
     Ray getRay(uint32_t i, uint32_t j);
     uint32_t getSampleCount() const { return samplePerPixel; }
 
@@ -48,6 +50,7 @@ private:
     glm::mat4 inversePorejction{1.f};
 
     std::vector<glm::vec3> rayDirections;
+    std::vector<glm::vec3> lights;
 
     glm::vec3 delta_u{};
     glm::vec3 delta_v{};

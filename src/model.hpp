@@ -25,10 +25,10 @@ public:
     uint32_t getIndicesCount() { return indices.size(); }
     void getTriangles(std::vector<Triangle> &triangles);
     std::vector<std::shared_ptr<Material>> &getMaterials() { return materials; }
+    void loadMaterials(const std::vector<glm::vec3> &lights);
 
 private:
     void loadModel(const std::string &modelPath);
-    void loadMaterials();
 
 private:
     // 使用tinyobjloader提供的读取模板
