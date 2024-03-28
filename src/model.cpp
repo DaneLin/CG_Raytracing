@@ -58,7 +58,7 @@ void Model::loadModel(const std::string &modelPath)
         {
             // Get material ID for this face
             int matID = shapes[s].mesh.material_ids[f];
-
+            AreaLight light;
             size_t fv = size_t(shapes[s].mesh.num_face_vertices[f]);
 
             for (size_t v = 0; v < fv; v++)
@@ -100,7 +100,9 @@ void Model::loadModel(const std::string &modelPath)
                     vertices.emplace_back(vertex);
                 }
                 indices.emplace_back(uniqueVertices[vertex]);
+                light[fv] = vertex.position;
             }
+            lights.push_back(light);
             indexOffset += fv;
         }
     }
@@ -138,7 +140,13 @@ void Model::loadMaterials(const std::vector<glm::vec3> &lights)
             else if (std::strncmp(mats[i].name.c_str(), "Mirror", 6) == 0)
             {
                 materials[i] = std::make_shared<Mirror>();
-                std::cout << "made a Miroor material!" << '\n';
+                std::cout << "made a Mirorr material!" << '\n';
+            }
+            else if (mats[i].specular[0] != 0)
+            {
+                // std::cout << "Shininess: " << mats[i].shininess << '\n';
+                materials[i] = std::make_shared<GlossyMaterial>(kd, 1.f / mats[i].shininess);
+                std::cout << "made a Glossy material!" << '\n';
             }
             else
             {

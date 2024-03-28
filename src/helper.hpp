@@ -5,11 +5,16 @@
 
 // std
 #include <cstdlib>
+#include <iostream>
 #include <random>
 
 namespace arc
 {
     const double eps = 1e-8;
+    inline int randomInt(int size)
+    {
+        return rand() % (size);
+    }
     inline double randomDouble()
     {
         // returns a random real in [0, 1]

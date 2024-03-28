@@ -7,9 +7,39 @@
 #include <glm/glm.hpp>
 #include "ray.hpp"
 #include "record.hpp"
+#include "helper.hpp"
 
 const float EPSILON = 0.0000001f;
-const float OFFSET = 0.001f;
+const float OFFSET = 0.0000001f;
+
+struct AreaLight
+{
+    glm::vec3 v0{}, v1{}, v2{};
+
+    glm::vec3 operator[](const int &idx) const
+    {
+        if (idx == 0)
+            return v0;
+        else if (idx == 1)
+            return v1;
+        else
+            return v2;
+    }
+    glm::vec3 randomSample()
+    {
+        float u = arc::randomDouble();
+        float v = arc::randomDouble(0, 1.f - u);
+        return (1.0f - u - v) * v0 + u * v1 + v * v2;
+    }
+
+    double triangleArea()
+    {
+        glm::vec3 edge1 = v1 - v0;
+        glm::vec3 edge2 = v2 - v0;
+        glm::vec3 cp = glm::cross(edge1, edge2);
+        return 0.5f * glm::dot(cp, cp);
+    }
+};
 
 struct Vertex
 {
@@ -70,6 +100,24 @@ struct BoundingBox
 
         if ((tmin > tymax) || (tmax < tymin))
             return false;
+        if (tmin < tymin)
+            tmin = tymin;
+        if (tmax > tymax)
+            tmax = tymax;
+
+        // float tzmin = (vMin.z - ray.origin.z) / (ray.direction.z);
+        // float tzmax = (vMin.z - ray.origin.z) / ray.direction.z;
+
+        // if (tzmin > tzmax)
+        //     std::swap(tzmin, tzmax);
+
+        // if (tzmin > tmax || tzmax < tmin)
+        //     return false;
+        // if (tmin < tzmin)
+        //     tmin = tzmin;
+        // if (tmax > tzmax)
+        //     tmax = tzmax;
+
         return true;
     }
 };

@@ -2,6 +2,7 @@
 #include <vector>
 #include <random>
 #include <memory>
+#include <ctime>
 #define TINYOBJLOADER_IMPLEMENTATION
 #define GLM_ENABLE_EXPERIMENTAL
 // third party
@@ -15,16 +16,17 @@
 
 int main(int, char **)
 {
-    Camera camera("../models/veach-mis/veach-mis.xml");
-    camera.setSamplePerPixel(10);
+    std::srand(std::time(nullptr));
+    Camera camera("../models/cornell-box/cornell-box.xml");
+    camera.setSamplePerPixel(100);
 
-    Model model("../models/veach-mis/veach-mis.obj");
+    Model model("../models/vikingroom/leftwall.obj");
     model.loadMaterials(camera.getLights());
     std::vector<Triangle> triangles;
     model.getTriangles(triangles);
-    Scene scene(triangles, model.getMaterials());
+    Scene scene(triangles, model.getMaterials(), model.getLights());
     Renderer renderer(camera, scene);
-    renderer.setBoudingTime(5);
+    renderer.setBoudingTime(10);
     renderer.render();
 
     return 0;

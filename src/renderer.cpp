@@ -94,7 +94,9 @@ glm::vec3 Renderer::traceRay(const Ray &ray, int depth)
     float hitTime = std::numeric_limits<float>::max();
     if (!intersectRayBVH(ray, node, hitResult, hitTime))
     {
-        return glm::vec3(0.f);
+        if (depth == boundTime)
+            return glm::vec3(0.f);
+        return glm::vec3(1.f);
     }
     ScatteredResult scatteredResult;
     auto emissive = m_Scene->getMaterials()[hitResult.faceMaterialID]->emit(ray, hitResult, hitResult.hitUV.x, hitResult.hitUV.y);
@@ -103,7 +105,34 @@ glm::vec3 Renderer::traceRay(const Ray &ray, int depth)
     {
         return emissive;
     }
-	auto scatterPDF = m_Scene->getMaterials()[hitResult.faceMaterialID]->scatterPDF(ray, hitResult, scatteredResult.rayOut);
-	auto collection = scatteredResult.attenuation * scatterPDF * traceRay(scatteredResult.rayOut, depth - 1) / pdf;
+    auto scatterPDF = m_Scene->getMaterials()[hitResult.faceMaterialID]->scatterPDF(ray, hitResult, scatteredResult.rayOut);
+    auto collection = scatteredResult.attenuation * scatterPDF * traceRay(scatteredResult.rayOut, depth - 1) / pdf;
     return emissive + collection;
 }
+
+// glm::vec3 Renderer::traceRay(const Ray &ray, int depth)
+// {
+//     // depth <=0, we stop ray color collection
+//     if (depth <= 0)
+//         return glm::vec3(0.f);
+
+//     HitResult hitResult;
+//     auto node = m_Scene->getBVHTreeRoot();
+//     float hitTime = std::numeric_limits<float>::max();
+//     if (!intersectRayBVH(ray, node, hitResult, hitTime))
+//     {
+//         return glm::vec3(0.f);
+//     }
+//     ScatteredResult scatteredResult;
+//     auto toHitPoint = hitResult.hitWorldPosition - ray.origin;
+//     float distance = glm::dot(toHitPoint, toHitPoint);
+//     auto emissive = m_Scene->getMaterials()[hitResult.faceMaterialID]->emit(ray, hitResult, hitResult.hitUV.x, hitResult.hitUV.y) / distance;
+//     float pdf;
+//     if (!m_Scene->getMaterials()[hitResult.faceMaterialID]->scatter(ray, hitResult, scatteredResult, pdf))
+//     {
+//         return emissive;
+//     }
+//     auto scatterPDF = m_Scene->getMaterials()[hitResult.faceMaterialID]->scatterPDF(ray, hitResult, scatteredResult.rayOut);
+//     auto collection = scatteredResult.attenuation * scatterPDF * traceRay(scatteredResult.rayOut, depth - 1) / pdf;
+//     return emissive + collection;
+// }
