@@ -16,8 +16,8 @@ public:
     Camera(const std::string &filepath);
     void setViewTarget(glm::vec3 cameraPosition, glm::vec3 targetCenter, glm::vec3 upDiection);
     void setSamplePerPixel(uint32_t spp) { samplePerPixel = spp; }
-    const float getWidth() const { return imageWidth; }
-    const float getHeight() const { return imageHeight; }
+    const uint32_t getWidth() const { return imageWidth; }
+    const uint32_t getHeight() const { return imageHeight; }
     const glm::vec3 &getPosition() const { return position; }
     const glm::mat4 &getView() const { return view; }
     const glm::mat4 &getInverseView() const { return inverseView; }

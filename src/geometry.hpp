@@ -73,51 +73,33 @@ struct BoundingBox
         vMax.x = std::max(vMax.x, other.x);
         vMax.y = std::max(vMax.y, other.y);
         vMax.z = std::max(vMax.z, other.z);
-
+        auto split = PADDING / 2;
         for (int i = 0; i < 3; i++)
         {
             if (vMax[i] - vMin[i] <= PADDING)
             {
-                vMax[i] += PADDING;
-                vMin[i] -= PADDING;
+                vMax[i] += split;
+                vMin[i] -= split;
             }
         }
     }
 
     bool intersect(const Ray &ray) const
     {
-        float tmin = (vMin.x - ray.origin.x) / ray.direction.x;
-        float tmax = (vMax.x - ray.origin.x) / ray.direction.x;
+        float tmin = 0.00000f;
+        float tmax = std::numeric_limits<float>().max();
+        for (int i = 0; i < 3; i++)
+        {
+            float minTime = std::min((vMin[i] - ray.origin[i]) / ray.direction[i],
+                                     (vMax[i] - ray.origin[i]) / ray.direction[i]);
+            float maxTime = std::max((vMin[i] - ray.origin[i]) / ray.direction[i],
+                                     (vMax[i] - ray.origin[i]) / ray.direction[i]);
+            tmin = std::max(tmin, minTime);
+            tmax = std::min(tmax, maxTime);
 
-        if (tmin > tmax)
-            std::swap(tmin, tmax);
-
-        float tymin = (vMin.y - ray.origin.y) / ray.direction.y;
-        float tymax = (vMax.y - ray.origin.y) / ray.direction.y;
-
-        if (tymin > tymax)
-            std::swap(tymin, tymax);
-
-        if ((tmin > tymax) || (tmax < tymin))
-            return false;
-        if (tmin < tymin)
-            tmin = tymin;
-        if (tmax > tymax)
-            tmax = tymax;
-
-        // float tzmin = (vMin.z - ray.origin.z) / (ray.direction.z);
-        // float tzmax = (vMin.z - ray.origin.z) / ray.direction.z;
-
-        // if (tzmin > tzmax)
-        //     std::swap(tzmin, tzmax);
-
-        // if (tzmin > tmax || tzmax < tmin)
-        //     return false;
-        // if (tmin < tzmin)
-        //     tmin = tzmin;
-        // if (tmax > tzmax)
-        //     tmax = tzmax;
-
+            if (tmin > tmax)
+                return false;
+        }
         return true;
     }
 };
@@ -136,7 +118,6 @@ public:
     Triangle(Vertex _v0, Vertex _v1, Vertex _v2)
         : v0(_v0), v1(_v1), v2(_v2) {}
 
-    // 重载 [] 操作符
     Vertex operator[](size_t index) const
     {
         assert(index < 3 && "out of range!");

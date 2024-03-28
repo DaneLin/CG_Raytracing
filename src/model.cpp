@@ -1,6 +1,8 @@
 #include "model.hpp"
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/hash.hpp>
+#define TINYOBJLOADER_IMPLEMENTATION
+#include <tiny_obj_loader.h>
 // std
 #include <iostream>
 #include <unordered_map>
@@ -22,13 +24,16 @@ namespace std
     };
 }
 
-Model::Model(const std::string &modelPath)
+Model::Model(const std::string &modelPath, const std::vector<glm::vec3> &radiances)
 {
-    loadModel(modelPath);
+    loadModel(modelPath, radiances);
 }
 
-void Model::loadModel(const std::string &modelPath)
+void Model::loadModel(const std::string &modelPath, const std::vector<glm::vec3> &radiances)
 {
+    // 使用tinyobjloader提供的读取模板
+    tinyobj::ObjReaderConfig readerConfig;
+    tinyobj::ObjReader reader;
     readerConfig.mtl_search_path = "";
 
     if (!reader.ParseFromFile(modelPath, readerConfig))
@@ -107,10 +112,7 @@ void Model::loadModel(const std::string &modelPath)
         }
     }
     std::cout << "Indices: " << indices.size() << std::endl;
-}
 
-void Model::loadMaterials(const std::vector<glm::vec3> &lights)
-{
     auto &mats = reader.GetMaterials();
     std::cout << "Materials: " << mats.size() << '\n';
     materials.clear();
@@ -134,7 +136,7 @@ void Model::loadMaterials(const std::vector<glm::vec3> &lights)
                     idx = mats[i].name.back() - '0';
                 }
 
-                materials[i] = std::make_shared<LightSource>(lights[idx - 1]);
+                materials[i] = std::make_shared<LightSource>(radiances[idx - 1]);
                 std::cout << "made a light source material!" << '\n';
             }
             else if (std::strncmp(mats[i].name.c_str(), "Mirror", 6) == 0)

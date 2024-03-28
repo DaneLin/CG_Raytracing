@@ -3,7 +3,7 @@
 #include <random>
 #include <memory>
 #include <ctime>
-#define TINYOBJLOADER_IMPLEMENTATION
+
 #define GLM_ENABLE_EXPERIMENTAL
 // third party
 #include <glm/glm.hpp>
@@ -20,8 +20,8 @@ int main(int, char **)
     Camera camera("../models/cornell-box/cornell-box.xml");
     camera.setSamplePerPixel(100);
 
-    Model model("../models/vikingroom/leftwall.obj");
-    model.loadMaterials(camera.getLights());
+    Model model("../models/vikingroom/leftwall.obj", camera.getLights());
+
     std::vector<Triangle> triangles;
     model.getTriangles(triangles);
     Scene scene(triangles, model.getMaterials(), model.getLights());
