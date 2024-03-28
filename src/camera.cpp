@@ -113,7 +113,7 @@ Ray Camera::getRay(uint32_t i, uint32_t j)
 
 glm::vec3 Camera::uniformSampleSquare()
 {
-    float px = -0.5 + randomFloat();
-    float py = -0.5 + randomFloat();
+    float px = -0.5 + arc::randomDouble();
+    float py = -0.5 + arc::randomDouble();
     return px * delta_u + py * delta_v;
 }

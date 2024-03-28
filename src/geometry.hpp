@@ -1,10 +1,15 @@
 #ifndef __GEOMETRY_H__
 #define __GEOMETRY_H__
 
+// std
+#include <memory>
+
 #include <glm/glm.hpp>
 #include "ray.hpp"
+#include "record.hpp"
 
 const float EPSILON = 0.0000001f;
+const float OFFSET = 0.001f;
 
 struct Vertex
 {
@@ -13,6 +18,7 @@ struct Vertex
     glm::vec3 normal{};
     glm::vec2 uv{};
 
+    int faceMaterialID = -1;
     bool operator==(const Vertex &v) const
     {
         return position == v.position &&

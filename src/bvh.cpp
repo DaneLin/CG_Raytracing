@@ -1,4 +1,5 @@
 #include "bvh.hpp"
+#include "record.hpp"
 
 static bool intersectRayBVH(const Ray &ray, const BVHNode *node, HitResult &hitResult, float &time)
 {

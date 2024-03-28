@@ -1,14 +1,12 @@
 #include "model.hpp"
 
-#define TINYOBJLOADER_IMPLEMENTATION
-#include <loader/tiny_obj_loader.h>
-
 #include <glm/gtx/hash.hpp>
 
 // std
 #include <iostream>
 #include <unordered_map>
 #include <functional>
+#include <cstring>
 
 namespace std
 {
@@ -35,13 +33,11 @@ namespace std
 Model::Model(const std::string &modelPath)
 {
     loadModel(modelPath);
+    loadMaterials();
 }
 
 void Model::loadModel(const std::string &modelPath)
 {
-    // 使用tinyobjloader提供的读取模板
-    tinyobj::ObjReaderConfig readerConfig;
-    tinyobj::ObjReader reader;
     readerConfig.mtl_search_path = "";
 
     if (!reader.ParseFromFile(modelPath, readerConfig))
@@ -59,32 +55,32 @@ void Model::loadModel(const std::string &modelPath)
 
     auto &attrib = reader.GetAttrib();
     auto &shapes = reader.GetShapes();
-    auto &materials = reader.GetMaterials();
-    std::cout << "Materials: " << materials.size() << '\n';
-    for (size_t i = 0; i < materials.size(); ++i)
-    {
-        std::cout << "material " << i << ": " << materials[i].name << std::endl;
-        std::cout << "  diffuse_texname: " << materials[i].diffuse_texname << std::endl;
-    }
 
     vertices.clear();
     indices.clear();
 
     std::unordered_map<Vertex, uint32_t> uniqueVertices{};
+
     // loop over shapes
     for (size_t s = 0; s < shapes.size(); ++s)
     {
         size_t indexOffset = 0;
         for (size_t f = 0; f < shapes[s].mesh.num_face_vertices.size(); ++f)
         {
+            // Get material ID for this face
+            int matID = shapes[s].mesh.material_ids[f];
+
             size_t fv = size_t(shapes[s].mesh.num_face_vertices[f]);
 
             for (size_t v = 0; v < fv; v++)
             {
                 tinyobj::index_t idx = shapes[s].mesh.indices[indexOffset + v];
+
                 Vertex vertex{};
+                vertex.faceMaterialID = matID;
                 if (idx.vertex_index >= 0)
                 {
+
                     vertex.position.x = attrib.vertices[3 * size_t(idx.vertex_index) + 0];
                     vertex.position.y = attrib.vertices[3 * size_t(idx.vertex_index) + 1];
                     vertex.position.z = attrib.vertices[3 * size_t(idx.vertex_index) + 2];
@@ -120,6 +116,38 @@ void Model::loadModel(const std::string &modelPath)
         }
     }
     std::cout << "Indices: " << indices.size() << std::endl;
+}
+
+void Model::loadMaterials()
+{
+    auto &mats = reader.GetMaterials();
+
+    std::cout << "Materials: " << mats.size() << '\n';
+    materials.clear();
+    materials.resize(mats.size());
+    for (size_t i = 0; i < mats.size(); ++i)
+    {
+        std::cout << "material " << i << ": " << mats[i].name << std::endl;
+        std::cout << "  diffuse_texname: " << mats[i].diffuse_texname << std::endl;
+        std::cout << "  diffuse color: " << mats[i].diffuse[0] << ' '
+                  << mats[i].diffuse[1] << ' '
+                  << mats[i].diffuse[2] << std::endl;
+        glm::vec3 kd = {mats[i].diffuse[0], mats[i].diffuse[1], mats[i].diffuse[2]};
+        // solid color
+        if (mats[i].diffuse_texname.length() == 0)
+        {
+            if (std::strncmp(mats[i].name.c_str(), "Light", 5) == 0)
+            {
+                materials[i] = std::make_shared<LightSource>(glm::vec3{32, 24, 8});
+                std::cout << "made a light source material!" << '\n';
+            }
+            else
+            {
+                materials[i] = std::make_shared<Lambertian>(kd);
+                std::cout << "made a solid color material!" << '\n';
+            }
+        }
+    }
 }
 
 void Model::getTriangles(std::vector<Triangle> &triangles)

@@ -30,42 +30,6 @@ BoundingBox Triangle::getBoundingBox()
 
     return boudingBox;
 }
-// HitResult Triangle::getIntersection(const Ray &ray)
-// {
-//     HitResult hitResult;
-
-//     /*
-
-//     */
-//     glm::vec3 edge1 = v1.position - v0.position;
-//     glm::vec3 edge2 = v2.position - v0.position;
-
-//     glm::vec3 h = glm::cross(ray.direction, edge2);
-//     // 判断是否平行
-//     float angle = glm::dot(h, edge1);
-//     if (angle > -EPSILON && angle < EPSILON)
-//         return hitResult;
-
-//     float f = 1.f / angle;
-//     glm::vec3 side = ray.origin - v0.position;
-//     float u = f * glm::dot(side, h);
-//     if (u < 0.f || u > 1.f)
-//         return hitResult;
-
-//     glm::vec3 side1 = glm::cross(side, edge1);
-//     float v = f * glm::dot(ray.direction, side1);
-//     if (v < 0.f || u + v > 1.f)
-//         return hitResult;
-
-//     float time = f * glm::dot(edge2, side1);
-//     if (time > EPSILON)
-//     {
-//         hitResult.isHit = true;
-//         hitResult.hitWorldNormal = glm::cross(edge2, edge1);
-//         hitResult.hitTime = std::min(time, hitResult.hitTime);
-//     }
-//     return hitResult;
-// }
 
 HitResult Triangle::getIntersection(const Ray &ray)
 {
@@ -102,10 +66,10 @@ HitResult Triangle::getIntersection(const Ray &ray)
     {
         hitResult.isHit = true;
         hitResult.hitWorldNormal = glm::normalize(glm::cross(edge1, edge2)); // 计算三角形法向量
-        hitResult.hitWorldPosition = ray.origin + ray.direction * time;
-        // std::cout << hitResult.hitWorldPosition.x << ' '
-        //           << hitResult.hitWorldPosition.y << ' '
-        //           << hitResult.hitWorldPosition.z << std::endl;
+        // 设定一定的偏移量
+        hitResult.hitWorldPosition = ray.origin + ray.direction * time + hitResult.hitWorldNormal * OFFSET;
+        hitResult.hitUV = (1 - u - v) * v0.uv + u * v1.uv + v * v2.uv;
+        hitResult.faceMaterialID = v0.faceMaterialID;
         hitResult.hitTime = time;
     }
     return hitResult;

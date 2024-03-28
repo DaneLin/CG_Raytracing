@@ -3,16 +3,10 @@
 
 #include <glm/glm.hpp>
 
-struct HitResult
+class Ray
 {
-    bool isHit = false;
-    float hitTime = std::numeric_limits<float>::max();
-    glm::vec3 hitWorldNormal{};
-    glm::vec3 hitWorldPosition{};
-};
-
-struct Ray
-{
+public:
+    Ray() = default;
     Ray(const glm::vec3 &origin, const glm::vec3 &direction)
         : origin(origin), direction(direction)
     {

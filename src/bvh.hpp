@@ -2,6 +2,7 @@
 #define __BVH_H__
 
 #include "geometry.hpp"
+#include "ray.hpp"
 
 // std
 #include <vector>
