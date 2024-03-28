@@ -3,6 +3,7 @@
 #include <random>
 #include <memory>
 #define TINYOBJLOADER_IMPLEMENTATION
+#define GLM_ENABLE_EXPERIMENTAL
 // third party
 #include <glm/glm.hpp>
 

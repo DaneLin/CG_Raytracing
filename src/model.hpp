@@ -7,7 +7,7 @@
 // thirdparty
 #include <glm/glm.hpp>
 
-#include <loader/tiny_obj_loader.h>
+#include <tiny_obj_loader.h>
 
 // std
 #include <string>

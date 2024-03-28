@@ -6,7 +6,7 @@
 // thirdparty
 #include <glm/glm.hpp>
 #define STB_IMAGE_IMPLEMENTATION
-#include <loader/stb_image.h>
+#include <stb_image.h>
 
 Texture::Texture(const std::string &imagePath)
 {

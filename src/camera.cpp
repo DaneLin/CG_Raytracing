@@ -3,7 +3,7 @@
 
 // thirdparty
 #include <glm/gtc/matrix_transform.hpp>
-#include "loader/tinyxml2.h"
+#include "tinyxml2.h"
 
 // std
 #include <random>

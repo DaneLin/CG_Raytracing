@@ -12,7 +12,7 @@ find_package(OpenMP REQUIRED)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-include_directories(src thirdparty)
+include_directories(src thirdparty/glm thirdparty/loader)
 
 file(GLOB SOURCES "src/*.cpp")
 
