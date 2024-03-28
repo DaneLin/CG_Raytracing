@@ -1,10 +1,26 @@
 #include "model.hpp"
-
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/hash.hpp>
 // std
 #include <iostream>
 #include <unordered_map>
 #include <functional>
 #include <cstring>
+
+namespace std
+{
+    template <>
+    struct hash<Vertex>
+    {
+        size_t operator()(Vertex const &vertex) const
+        {
+            return ((hash<glm::vec3>()(vertex.position) ^
+                     (hash<glm::vec3>()(vertex.color) << 1)) >>
+                    1) ^
+                   (hash<glm::vec2>()(vertex.uv) << 1);
+        }
+    };
+}
 
 Model::Model(const std::string &modelPath)
 {
@@ -34,7 +50,7 @@ void Model::loadModel(const std::string &modelPath)
 
     vertices.clear();
     indices.clear();
-
+    std::unordered_map<Vertex, uint32_t> uniqueVertices{};
     // loop over shapes
     for (size_t s = 0; s < shapes.size(); ++s)
     {
@@ -79,9 +95,12 @@ void Model::loadModel(const std::string &modelPath)
                     vertex.uv.y = attrib.texcoords[2 * size_t(idx.texcoord_index) + 1];
                 }
 
-                vertices.emplace_back(vertex);
-
-                indices.emplace_back(vertices.size());
+                if (uniqueVertices.count(vertex) == 0)
+                {
+                    uniqueVertices[vertex] = static_cast<uint32_t>(vertices.size());
+                    vertices.emplace_back(vertex);
+                }
+                indices.emplace_back(uniqueVertices[vertex]);
             }
             indexOffset += fv;
         }
