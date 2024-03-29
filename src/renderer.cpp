@@ -14,9 +14,9 @@ glm::vec3 Renderer::convertToRGB(const glm::vec3 &color)
 {
 
     float scale = 1.f / (float)m_Camera->getSampleCount();
-    auto r = color.r * scale * 255.f;
-    auto g = color.g * scale * 255.f;
-    auto b = color.b * scale * 255.f;
+    auto r = glm::clamp(std::sqrt(color.r * scale), 0.f, 1.f) * 255.f;
+    auto g = glm::clamp(std::sqrt(color.g * scale), 0.f, 1.f) * 255.f;
+    auto b = glm::clamp(std::sqrt(color.b * scale), 0.f, 1.f) * 255.f;
 
     return {(uint32_t)r, (uint32_t)g, (uint32_t)b};
 }
@@ -38,7 +38,11 @@ void Renderer::render()
     {
         std::clog << "\rCreating image: " << std::fixed << std::setprecision(2) << ((float)y / (float)m_ImageHeight) * 100.f << "%" << std::flush;
 #pragma omp parallel for
+<<<<<<< HEAD
         for(int  x = 0; x < m_ImageWidth; ++x)
+=======
+        for (int x = 0; x < m_ImageWidth; ++x)
+>>>>>>> d412d2a (尝试添加读取的texture信息)
         {
             int idx = x + y * m_ImageWidth;
             glm::vec3 color{};
@@ -104,26 +108,26 @@ glm::vec3 Renderer::traceRay(const Ray &ray, int depth)
 
     glm::vec3 directLight{0.f}, indirectLight{0.f};
     // direct light
-    //float pdfLight = 0.f;
-    //int lightIdx = arc::randomInt(m_Scene->getLights().size());
-    //auto light = m_Scene->getLights();
-    //HitResult lightHitResult;
-    //light[lightIdx].sample(lightHitResult, pdfLight);
-    //glm::vec3 objPoint = hitResult.hitWorldPosition;
-    //glm::vec3 lightPoint = lightHitResult.hitWorldPosition;
-    //glm::vec3 obj2Light = lightPoint - objPoint;
-    //float distance = glm::dot(obj2Light, obj2Light);
-    //obj2Light = glm::normalize(obj2Light);
+    // float pdfLight = 0.f;
+    // int lightIdx = arc::randomInt(m_Scene->getLights().size());
+    // auto light = m_Scene->getLights();
+    // HitResult lightHitResult;
+    // light[lightIdx].sample(lightHitResult, pdfLight);
+    // glm::vec3 objPoint = hitResult.hitWorldPosition;
+    // glm::vec3 lightPoint = lightHitResult.hitWorldPosition;
+    // glm::vec3 obj2Light = lightPoint - objPoint;
+    // float distance = glm::dot(obj2Light, obj2Light);
+    // obj2Light = glm::normalize(obj2Light);
 
-    //glm::vec3 objNormal = hitResult.hitWorldNormal;
-    //glm::vec3 lightNormal = lightHitResult.hitWorldNormal;
+    // glm::vec3 objNormal = hitResult.hitWorldNormal;
+    // glm::vec3 lightNormal = lightHitResult.hitWorldNormal;
 
-    //Ray toLightRay(hitResult.hitWorldPosition, obj2Light);
-    //HitResult toLight = intersectRayBVH(toLightRay, node);
-    //if (toLight.distance - distance > -0.0000001f)
+    // Ray toLightRay(hitResult.hitWorldPosition, obj2Light);
+    // HitResult toLight = intersectRayBVH(toLightRay, node);
+    // if (toLight.distance - distance > -0.0000001f)
     //{
-    //    directLight = light[lightIdx].mat->emit(); //* glm::dot(toLightRay.direction, objNormal) * glm::dot(-toLightRay.direction, lightNormal) / (distance);
-    //}
+    //     directLight = light[lightIdx].mat->emit(); //* glm::dot(toLightRay.direction, objNormal) * glm::dot(-toLightRay.direction, lightNormal) / (distance);
+    // }
 
     ScatteredResult scatteredResult;
     float pdf;
@@ -132,7 +136,7 @@ glm::vec3 Renderer::traceRay(const Ray &ray, int depth)
         return emissive;
     }
     auto scatterPDF = currentMat->scatterPDF(ray, hitResult, scatteredResult.rayOut);
-    indirectLight = scatteredResult.attenuation  * traceRay(scatteredResult.rayOut, depth - 1);
+    indirectLight = scatteredResult.attenuation * traceRay(scatteredResult.rayOut, depth - 1);
     return indirectLight;
 }
 

@@ -36,8 +36,8 @@ public:
 class Lambertian : public Material
 {
 public:
-    Lambertian() = default;
     Lambertian(glm::vec3 color) : albedo(color) {}
+    Lambertian(std::shared_ptr<Texture> &texture) : texture(texture) {}
     bool scatter(const Ray &ray, const HitResult &hitResult, ScatteredResult &scatterResult, float &pdf) const override
     {
         glm::vec3 scatterDirection = arc::randomInHemisphere(hitResult.hitWorldNormal);
@@ -57,8 +57,35 @@ public:
         return cosine < 0 ? 0 : cosine / PI;
     }
 
-private:
+public:
     glm::vec3 albedo{};
+    std::shared_ptr<Texture> texture = nullptr;
+};
+
+class LambertianTextured : public Material
+{
+public:
+    LambertianTextured(std::shared_ptr<Texture> tex) : texture(tex) {}
+    bool scatter(const Ray &ray, const HitResult &hitResult, ScatteredResult &scatterResult, float &pdf) const override
+    {
+        glm::vec3 scatterDirection = arc::randomInHemisphere(hitResult.hitWorldNormal);
+
+        if (arc::isNearZero(scatterDirection))
+            scatterDirection = hitResult.hitWorldNormal;
+        scatterResult.attenuation = texture->sample(hitResult.hitUV.x, hitResult.hitUV.y);
+        scatterResult.rayOut = Ray(hitResult.hitWorldPosition, scatterDirection);
+        scatterResult.skipPDF = false;
+        pdf = glm::dot(hitResult.hitWorldNormal, scatterDirection) / PI;
+        return true;
+    }
+
+    float scatterPDF(const Ray &rayIn, const HitResult &hitResult, const Ray &rayOut) const override
+    {
+        float cosine = glm::dot(hitResult.hitWorldNormal, rayOut.direction);
+        return cosine < 0 ? 0 : cosine / PI;
+    }
+
+public:
     std::shared_ptr<Texture> texture = nullptr;
 };
 

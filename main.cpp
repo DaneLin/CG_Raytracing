@@ -18,9 +18,9 @@ int main(int, char **)
 {
     std::srand(std::time(nullptr));
     Camera camera("../models/cornell-box/cornell-box.xml");
-    camera.setSamplePerPixel(2000);
+    camera.setSamplePerPixel(5000);
 
-    Model model("../models/cornell-box/cornell-box.obj", camera.getLights());
+    Model model("../models/vikingroom/leftwall copy.obj", camera.getLights());
     std::cout << "Scene lights: " << model.getLights().size() << std::endl;
     Scene scene(model.getTriangles(), model.getMaterials(), model.getLights());
     Renderer renderer(camera, scene);
