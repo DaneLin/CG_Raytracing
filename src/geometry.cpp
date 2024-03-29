@@ -77,6 +77,7 @@ HitResult Triangle::getIntersection(const Ray &ray)
         hitResult.hitWorldPosition = ray.origin + ray.direction * time + hitResult.hitWorldNormal * OFFSET;
         hitResult.hitUV = (1 - u - v) * uv0 + u * uv1 + v * uv2;
         hitResult.mat = mat;
+        hitResult.hitTime = time;
         hitResult.area = getArea();
         glm::vec3 ray2Point = hitResult.hitWorldPosition - ray.origin;
         hitResult.distance = glm::dot(ray2Point, ray2Point);

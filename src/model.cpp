@@ -60,7 +60,7 @@ void Model::loadModel(const std::string &modelPath, const std::vector<glm::vec3>
                 {
                     idx = mats[i].name.back() - '0';
                 }
-                materials[i] = std::make_shared<LightSource>(glm::vec3{0.8, 0.8, 0.8});
+                materials[i] = std::make_shared<LightSource>(radiances[idx-1]);
                 isLights[i] = true;
                 std::cout << "made a light source material!" << '\n';
             }

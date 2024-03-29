@@ -18,13 +18,13 @@ int main(int, char **)
 {
     std::srand(std::time(nullptr));
     Camera camera("../models/cornell-box/cornell-box.xml");
-    camera.setSamplePerPixel(100);
+    camera.setSamplePerPixel(2000);
 
-    Model model("../models/vikingroom/leftwall.obj", camera.getLights());
+    Model model("../models/cornell-box/cornell-box.obj", camera.getLights());
     std::cout << "Scene lights: " << model.getLights().size() << std::endl;
     Scene scene(model.getTriangles(), model.getMaterials(), model.getLights());
     Renderer renderer(camera, scene);
-    renderer.setBoudingTime(1);
+    renderer.setBoudingTime(50);
     renderer.render();
 
     return 0;

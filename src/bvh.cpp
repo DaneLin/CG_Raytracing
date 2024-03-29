@@ -129,7 +129,7 @@ static HitResult intersectRayBVH(const Ray &ray, const BVHNode *node)
     HitResult isLeftHit = intersectRayBVH(ray, node->leftNode);
     HitResult isRightHit = intersectRayBVH(ray, node->rightNode);
 
-    if (isLeftHit.distance > isRightHit.distance)
+    if (isLeftHit.hitTime > isRightHit.hitTime)
         return isRightHit;
     return isLeftHit;
 }

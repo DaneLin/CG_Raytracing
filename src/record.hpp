@@ -23,6 +23,7 @@ struct HitResult
     float area = std::numeric_limits<float>::max();
     glm::vec3 hitWorldNormal{};
     glm::vec3 hitWorldPosition{};
+    double hitTime = std::numeric_limits<double>::max();
     glm::vec2 hitUV{};
 };
 #endif
