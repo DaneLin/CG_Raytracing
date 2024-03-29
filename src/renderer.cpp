@@ -35,22 +35,21 @@ void Renderer::render()
     uint32_t sampleCount = m_Camera->getSampleCount();
     // #pragma omp parallel
     for (int y = 0; y < m_ImageHeight; ++y)
-        for (int y = 0; y < m_ImageHeight; ++y)
-        {
-            std::clog << "\rCreating image: " << std::fixed << std::setprecision(2) << ((float)y / (float)m_ImageHeight) * 100.f << "%" << std::flush;
+    {
+        std::clog << "\rCreating image: " << std::fixed << std::setprecision(2) << ((float)y / (float)m_ImageHeight) * 100.f << "%" << std::flush;
 #pragma omp parallel for
-            for (int x = 0; x < m_ImageWidth; ++x)
-            {
-                int idx = x + y * m_ImageWidth;
-                glm::vec3 color{};
+        for (int x = 0; x < m_ImageWidth; ++x)
+        {
+            int idx = x + y * m_ImageWidth;
+            glm::vec3 color{};
+            for (int spp = 0; spp < sampleCount; ++spp)
                 for (int spp = 0; spp < sampleCount; ++spp)
-                    for (int spp = 0; spp < sampleCount; ++spp)
-                    {
-                        color += pixelResult(x, y);
-                    }
-                m_PixelData[idx] = convertToRGB(color);
-            }
+                {
+                    color += pixelResult(x, y);
+                }
+            m_PixelData[idx] = convertToRGB(color);
         }
+    }
     generateImage();
 }
 
