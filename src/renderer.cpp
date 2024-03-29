@@ -35,24 +35,22 @@ void Renderer::render()
     uint32_t sampleCount = m_Camera->getSampleCount();
     // #pragma omp parallel
     for (int y = 0; y < m_ImageHeight; ++y)
-    {
-        std::clog << "\rCreating image: " << std::fixed << std::setprecision(2) << ((float)y / (float)m_ImageHeight) * 100.f << "%" << std::flush;
-#pragma omp parallel for
-<<<<<<< HEAD
-        for(int  x = 0; x < m_ImageWidth; ++x)
-=======
-        for (int x = 0; x < m_ImageWidth; ++x)
->>>>>>> d412d2a (尝试添加读取的texture信息)
+        for (int y = 0; y < m_ImageHeight; ++y)
         {
-            int idx = x + y * m_ImageWidth;
-            glm::vec3 color{};
-            for (int spp = 0; spp < sampleCount; ++spp)
+            std::clog << "\rCreating image: " << std::fixed << std::setprecision(2) << ((float)y / (float)m_ImageHeight) * 100.f << "%" << std::flush;
+#pragma omp parallel for
+            for (int x = 0; x < m_ImageWidth; ++x)
             {
-                color += pixelResult(x, y);
+                int idx = x + y * m_ImageWidth;
+                glm::vec3 color{};
+                for (int spp = 0; spp < sampleCount; ++spp)
+                    for (int spp = 0; spp < sampleCount; ++spp)
+                    {
+                        color += pixelResult(x, y);
+                    }
+                m_PixelData[idx] = convertToRGB(color);
             }
-            m_PixelData[idx] = convertToRGB(color);
         }
-    }
     generateImage();
 }
 
