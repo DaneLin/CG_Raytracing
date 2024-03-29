@@ -13,10 +13,10 @@
 glm::vec3 Renderer::convertToRGB(const glm::vec3 &color)
 {
 
-    float scale = 1.f / (float)m_Camera->getSampleCount();
-    auto r = glm::clamp(std::sqrt(color.r * scale), 0.f, 1.f) * 255.f;
-    auto g = glm::clamp(std::sqrt(color.g * scale), 0.f, 1.f) * 255.f;
-    auto b = glm::clamp(std::sqrt(color.b * scale), 0.f, 1.f) * 255.f;
+    // float scale = 1.f / (float)m_Camera->getSampleCount();
+    auto r = glm::clamp(std::sqrt(color.r), 0.f, 1.f) * 255.f;
+    auto g = glm::clamp(std::sqrt(color.g), 0.f, 1.f) * 255.f;
+    auto b = glm::clamp(std::sqrt(color.b), 0.f, 1.f) * 255.f;
 
     return {(uint32_t)r, (uint32_t)g, (uint32_t)b};
 }
@@ -34,25 +34,25 @@ void Renderer::render()
     float aspectRatio = (float)m_ImageWidth / (float)m_ImageHeight;
     uint32_t sampleCount = m_Camera->getSampleCount();
     // #pragma omp parallel
-    for (int y = 0; y < m_ImageHeight; ++y)
+    for (uint32_t y = 0; y < m_ImageHeight; ++y)
     {
         std::clog << "\rCreating image: " << std::fixed << std::setprecision(2) << ((float)y / (float)m_ImageHeight) * 100.f << "%" << std::flush;
+        int x = 0;
 #pragma omp parallel for
-        for (int x = 0; x < m_ImageWidth; ++x)
+        for (x = 0; x < m_ImageWidth; ++x)
         {
             int idx = x + y * m_ImageWidth;
             glm::vec3 color{};
-            for (int spp = 0; spp < sampleCount; ++spp)
-                for (int spp = 0; spp < sampleCount; ++spp)
-                {
-                    color += pixelResult(x, y);
-                }
+            // #pragma omp parallel for
+            for (uint32_t spp = 0; spp < sampleCount; ++spp)
+            {
+                color += pixelResult(x, y) / (float)sampleCount;
+            }
             m_PixelData[idx] = convertToRGB(color);
         }
     }
     generateImage();
 }
-
 void Renderer::setup()
 {
     m_ImageWidth = m_Camera->getWidth();
