@@ -22,7 +22,7 @@ public:
         return false;
     }
 
-    virtual glm::vec3 emit(const Ray &ray, const HitResult &hitResult, double u, double v) const
+    virtual glm::vec3 emit() const
     {
         return glm::vec3(0.f);
     }
@@ -53,7 +53,7 @@ public:
 
     float scatterPDF(const Ray &rayIn, const HitResult &hitResult, const Ray &rayOut) const override
     {
-        float cosine = glm::dot(hitResult.hitWorldNormal, glm::normalize(rayOut.direction));
+        float cosine = glm::dot(hitResult.hitWorldNormal, rayOut.direction);
         return cosine < 0 ? 0 : cosine / PI;
     }
 
@@ -86,7 +86,7 @@ public:
     LightSource() = default;
     LightSource(const glm::vec3 &radiance) : radiance(radiance) {}
 
-    glm::vec3 emit(const Ray &ray, const HitResult &hitResult, double u, double v) const override
+    glm::vec3 emit() const override
     {
         return radiance;
     }

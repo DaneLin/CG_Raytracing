@@ -12,26 +12,35 @@
 #include <vector>
 #include <memory>
 
+struct Vertex
+{
+    glm::vec3 position{};
+    glm::vec3 normal{};
+    glm::vec2 uv{};
+    bool operator==(const Vertex &v) const
+    {
+        return position == v.position &&
+               normal == v.normal &&
+               uv == v.uv;
+    }
+};
+
 class Model
 {
 public:
-    Model() = default;
     Model(const std::string &modelPath, const std::vector<glm::vec3> &radiances);
 
     ~Model() = default;
-
-    uint32_t getIndicesCount() { return static_cast<uint32_t>(indices.size()); }
-    void getTriangles(std::vector<Triangle> &triangles);
+    std::vector<Triangle> &getTriangles();
     std::vector<std::shared_ptr<Material>> &getMaterials() { return materials; }
-    std::vector<AreaLight> &getLights() { return lights; }
+    std::vector<Triangle> &getLights() { return lights; }
 
 private:
     void loadModel(const std::string &modelPath, const std::vector<glm::vec3> &radiances);
 
 private:
-    std::vector<Vertex> vertices;
-    std::vector<uint32_t> indices;
+    std::vector<Triangle> triangles;
     std::vector<std::shared_ptr<Material>> materials;
-    std::vector<AreaLight> lights;
+    std::vector<Triangle> lights;
 };
 #endif // __MODEL_H__

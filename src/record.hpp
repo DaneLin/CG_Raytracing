@@ -18,8 +18,9 @@ struct ScatteredResult
 struct HitResult
 {
     bool isHit = false;
-    float hitTime = std::numeric_limits<float>::max();
-    int faceMaterialID = -1;
+    double distance = std::numeric_limits<double>::max();
+    std::shared_ptr<Material> mat;
+    float area = std::numeric_limits<float>::max();
     glm::vec3 hitWorldNormal{};
     glm::vec3 hitWorldPosition{};
     glm::vec2 hitUV{};

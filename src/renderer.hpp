@@ -32,6 +32,7 @@ private:
     uint32_t m_ImageWidth, m_ImageHeight;
     std::vector<glm::vec3> m_PixelData{};
     uint32_t boundTime = 5;
+    const BVHNode *node = nullptr;
 
     Camera *m_Camera = nullptr;
     Scene *m_Scene = nullptr;

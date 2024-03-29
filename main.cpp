@@ -21,12 +21,10 @@ int main(int, char **)
     camera.setSamplePerPixel(100);
 
     Model model("../models/vikingroom/leftwall.obj", camera.getLights());
-
-    std::vector<Triangle> triangles;
-    model.getTriangles(triangles);
-    Scene scene(triangles, model.getMaterials(), model.getLights());
+    std::cout << "Scene lights: " << model.getLights().size() << std::endl;
+    Scene scene(model.getTriangles(), model.getMaterials(), model.getLights());
     Renderer renderer(camera, scene);
-    renderer.setBoudingTime(10);
+    renderer.setBoudingTime(1);
     renderer.render();
 
     return 0;

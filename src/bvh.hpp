@@ -20,9 +20,9 @@ struct BVHNode
     {
         for (auto &triangle : triangles)
         {
-            boundingBox.merge(triangle[0].position);
-            boundingBox.merge(triangle[1].position);
-            boundingBox.merge(triangle[2].position);
+            boundingBox.merge(triangle.v0);
+            boundingBox.merge(triangle.v1);
+            boundingBox.merge(triangle.v2);
         }
     }
 

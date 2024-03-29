@@ -9,21 +9,6 @@
 #include <functional>
 #include <cstring>
 
-namespace std
-{
-    template <>
-    struct hash<Vertex>
-    {
-        size_t operator()(Vertex const &vertex) const
-        {
-            return ((hash<glm::vec3>()(vertex.position) ^
-                     (hash<glm::vec3>()(vertex.color) << 1)) >>
-                    1) ^
-                   (hash<glm::vec2>()(vertex.uv) << 1);
-        }
-    };
-}
-
 Model::Model(const std::string &modelPath, const std::vector<glm::vec3> &radiances)
 {
     loadModel(modelPath, radiances);
@@ -52,71 +37,11 @@ void Model::loadModel(const std::string &modelPath, const std::vector<glm::vec3>
     auto &attrib = reader.GetAttrib();
     auto &shapes = reader.GetShapes();
 
-    vertices.clear();
-    indices.clear();
-    std::unordered_map<Vertex, uint32_t> uniqueVertices{};
-    // loop over shapes
-    for (size_t s = 0; s < shapes.size(); ++s)
-    {
-        size_t indexOffset = 0;
-        for (size_t f = 0; f < shapes[s].mesh.num_face_vertices.size(); ++f)
-        {
-            // Get material ID for this face
-            int matID = shapes[s].mesh.material_ids[f];
-            AreaLight light;
-            size_t fv = size_t(shapes[s].mesh.num_face_vertices[f]);
-
-            for (size_t v = 0; v < fv; v++)
-            {
-                tinyobj::index_t idx = shapes[s].mesh.indices[indexOffset + v];
-
-                Vertex vertex{};
-                vertex.faceMaterialID = matID;
-                if (idx.vertex_index >= 0)
-                {
-
-                    vertex.position.x = attrib.vertices[3 * size_t(idx.vertex_index) + 0];
-                    vertex.position.y = attrib.vertices[3 * size_t(idx.vertex_index) + 1];
-                    vertex.position.z = attrib.vertices[3 * size_t(idx.vertex_index) + 2];
-
-                    vertex.color.x = attrib.colors[3 * size_t(idx.vertex_index) + 0];
-                    vertex.color.y = attrib.colors[3 * size_t(idx.vertex_index) + 1];
-                    vertex.color.z = attrib.colors[3 * size_t(idx.vertex_index) + 2];
-                }
-
-                // Check for normal
-                if (idx.normal_index >= 0)
-                {
-
-                    vertex.normal.x = attrib.normals[3 * size_t(idx.normal_index) + 0];
-                    vertex.normal.y = attrib.normals[3 * size_t(idx.normal_index) + 1];
-                    vertex.normal.z = attrib.normals[3 * size_t(idx.normal_index) + 2];
-                }
-
-                if (idx.texcoord_index >= 0)
-                {
-                    vertex.uv.x = attrib.texcoords[2 * size_t(idx.texcoord_index) + 0];
-                    vertex.uv.y = attrib.texcoords[2 * size_t(idx.texcoord_index) + 1];
-                }
-
-                if (uniqueVertices.count(vertex) == 0)
-                {
-                    uniqueVertices[vertex] = static_cast<uint32_t>(vertices.size());
-                    vertices.emplace_back(vertex);
-                }
-                indices.emplace_back(uniqueVertices[vertex]);
-                light[fv] = vertex.position;
-            }
-            lights.push_back(light);
-            indexOffset += fv;
-        }
-    }
-    std::cout << "Indices: " << indices.size() << std::endl;
-
     auto &mats = reader.GetMaterials();
     std::cout << "Materials: " << mats.size() << '\n';
     materials.clear();
     materials.resize(mats.size());
+    std::vector<bool> isLights(mats.size(), false);
     for (size_t i = 0; i < mats.size(); ++i)
     {
         std::cout << "material " << i << ": " << mats[i].name << std::endl;
@@ -135,8 +60,8 @@ void Model::loadModel(const std::string &modelPath, const std::vector<glm::vec3>
                 {
                     idx = mats[i].name.back() - '0';
                 }
-
-                materials[i] = std::make_shared<LightSource>(radiances[idx - 1]);
+                materials[i] = std::make_shared<LightSource>(glm::vec3{0.8, 0.8, 0.8});
+                isLights[i] = true;
                 std::cout << "made a light source material!" << '\n';
             }
             else if (std::strncmp(mats[i].name.c_str(), "Mirror", 6) == 0)
@@ -157,15 +82,57 @@ void Model::loadModel(const std::string &modelPath, const std::vector<glm::vec3>
             }
         }
     }
+
+    // loop over shapes
+    for (size_t s = 0; s < shapes.size(); ++s)
+    {
+        size_t indexOffset = 0;
+        for (size_t f = 0; f < shapes[s].mesh.num_face_vertices.size(); ++f)
+        {
+            // Get material ID for this face
+            int matID = shapes[s].mesh.material_ids[f];
+            size_t fv = size_t(shapes[s].mesh.num_face_vertices[f]);
+            Vertex vertices[3];
+            for (size_t v = 0; v < fv; v++)
+            {
+                tinyobj::index_t idx = shapes[s].mesh.indices[indexOffset + v];
+
+                Vertex vertex{};
+                if (idx.vertex_index >= 0)
+                {
+                    vertex.position.x = attrib.vertices[3 * size_t(idx.vertex_index) + 0];
+                    vertex.position.y = attrib.vertices[3 * size_t(idx.vertex_index) + 1];
+                    vertex.position.z = attrib.vertices[3 * size_t(idx.vertex_index) + 2];
+                }
+
+                // Check for normal
+                if (idx.normal_index >= 0)
+                {
+                    vertex.normal.x = attrib.normals[3 * size_t(idx.normal_index) + 0];
+                    vertex.normal.y = attrib.normals[3 * size_t(idx.normal_index) + 1];
+                    vertex.normal.z = attrib.normals[3 * size_t(idx.normal_index) + 2];
+                }
+
+                if (idx.texcoord_index >= 0)
+                {
+                    vertex.uv.x = attrib.texcoords[2 * size_t(idx.texcoord_index) + 0];
+                    vertex.uv.y = attrib.texcoords[2 * size_t(idx.texcoord_index) + 1];
+                }
+
+                vertices[v] = vertex;
+            }
+            Triangle tris(vertices[0].position, vertices[1].position, vertices[2].position);
+            tris.setUVs(vertices[0].uv, vertices[1].uv, vertices[2].uv);
+            tris.mat = materials[matID];
+            triangles.emplace_back(tris);
+            if (isLights[matID])
+                lights.emplace_back(tris);
+            indexOffset += fv;
+        }
+    }
 }
 
-void Model::getTriangles(std::vector<Triangle> &triangles)
+std::vector<Triangle> &Model::getTriangles()
 {
-    triangles.clear();
-
-    for (uint32_t idx = 0; idx < indices.size(); idx += 3)
-    {
-        Triangle tmp{vertices[indices[idx]], vertices[indices[idx + 1]], vertices[indices[idx + 2]]};
-        triangles.push_back(tmp);
-    }
+    return triangles;
 }
