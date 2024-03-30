@@ -74,8 +74,8 @@ void Model::loadModel(const std::string &modelPath, const std::vector<glm::vec3>
             else if (mats[i].specular[0] != 0)
             {
                 // std::cout << "Shininess: " << mats[i].shininess << '\n';
-                materials[i] = std::make_shared<GlossyMaterial>(kd, 1.f / mats[i].shininess);
-                std::cout << "made a Glossy material!" << '\n';
+                materials[i] = std::make_shared<Metal>(kd, 100.f / mats[i].shininess);
+                std::cout << "made a Metal material!" << '\n';
             }
             else if (mats[i].diffuse_texname != "")
             {

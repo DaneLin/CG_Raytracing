@@ -47,14 +47,14 @@ public:
         scatterResult.attenuation = albedo;
         scatterResult.rayOut = Ray(hitResult.hitWorldPosition, scatterDirection);
         scatterResult.skipPDF = false;
-        pdf = glm::dot(hitResult.hitWorldNormal, scatterDirection) / PI;
+        pdf = static_cast<float>(glm::dot(hitResult.hitWorldNormal, scatterDirection) / PI);
         return true;
     }
 
     float scatterPDF(const Ray &rayIn, const HitResult &hitResult, const Ray &rayOut) const override
     {
         float cosine = glm::dot(hitResult.hitWorldNormal, rayOut.direction);
-        return cosine < 0 ? 0 : cosine / PI;
+        return cosine < 0 ? 0.f : static_cast<float>(cosine / PI);
     }
 
 public:
@@ -75,14 +75,14 @@ public:
         scatterResult.attenuation = texture->sample(hitResult.hitUV.x, hitResult.hitUV.y);
         scatterResult.rayOut = Ray(hitResult.hitWorldPosition, scatterDirection);
         scatterResult.skipPDF = false;
-        pdf = glm::dot(hitResult.hitWorldNormal, scatterDirection) / PI;
+        pdf = static_cast<float>(glm::dot(hitResult.hitWorldNormal, scatterDirection) / PI);
         return true;
     }
 
     float scatterPDF(const Ray &rayIn, const HitResult &hitResult, const Ray &rayOut) const override
     {
         float cosine = glm::dot(hitResult.hitWorldNormal, rayOut.direction);
-        return cosine < 0 ? 0 : cosine / PI;
+        return cosine < 0.f ? 0.f : static_cast<float>(cosine / PI);
     }
 
 public:
@@ -123,6 +123,24 @@ private:
     glm::vec3 radiance{};
 };
 
+class Metal :public Material
+{
+public:
+    Metal(const glm::vec3& albedo, float specular)
+        : albedo(albedo), specularExp(specular) {}
+	bool scatter(const Ray& ray, const HitResult& hitResult, ScatteredResult& scatteredResult, float& pdf) const override
+	{
+        glm::vec3 reflected = glm::reflect(ray.direction, hitResult.hitWorldNormal);
+        scatteredResult.rayOut = Ray(hitResult.hitWorldPosition, reflected + specularExp * arc::randomUnitVector());
+        scatteredResult.attenuation = albedo;
+        return glm::dot(scatteredResult.rayOut.direction, hitResult.hitWorldNormal) > 0.f;
+    }
+
+private:
+    glm::vec3 albedo{};
+    float specularExp;
+};
+
 class GlossyMaterial : public Material
 {
 public:
@@ -135,7 +153,7 @@ public:
         float nDotH = std::max(0.0f, glm::dot(hitResult.hitWorldNormal, halfway));
 
         // Cook-Torrance microfacet BRDF
-        float F = fresnel(glm::dot(ray.direction, halfway), 0.04);
+        float F = fresnel(glm::dot(ray.direction, halfway), 0.04f);
         float G = smithGGXCorrelated(glm::dot(hitResult.hitWorldNormal, ray.direction), glm::dot(hitResult.hitWorldNormal, glm::normalize(ray.direction)), m_Roughness);
         float D = GGX(nDotH, m_Roughness);
 
@@ -145,7 +163,7 @@ public:
         scatteredResult.rayOut = Ray(hitResult.hitWorldPosition, reflectDir);
         scatteredResult.attenuation = m_Albedo * brdf;
         scatteredResult.skipPDF = false;
-        pdf = brdf * glm::dot(hitResult.hitWorldNormal, glm::normalize(scatteredResult.rayOut.direction)) / PI;
+        pdf = static_cast<float>(brdf * glm::dot(hitResult.hitWorldNormal, glm::normalize(scatteredResult.rayOut.direction)) / PI);
         return true;
     }
 
@@ -154,7 +172,7 @@ public:
         glm::vec3 halfway = glm::normalize(rayIn.direction + rayOut.direction);
         float nDotH = std::max(0.0f, glm::dot(hitResult.hitWorldNormal, halfway));
         float brdf = GGX(nDotH, m_Roughness);
-        return brdf * glm::dot(hitResult.hitWorldNormal, glm::normalize(rayOut.direction)) / PI;
+        return static_cast<float>(brdf * glm::dot(hitResult.hitWorldNormal, glm::normalize(rayOut.direction)) / PI);
     }
 
 private:

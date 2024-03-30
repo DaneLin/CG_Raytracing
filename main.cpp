@@ -16,11 +16,11 @@
 
 int main(int, char **)
 {
-    std::srand(std::time(nullptr));
-    Camera camera("../models/cornell-box/cornell-box.xml");
+    std::srand((unsigned int)std::time(nullptr));
+    Camera camera("../models/veach-mis/veach-mis.xml");
     camera.setSamplePerPixel(1000);
 
-    Model model("../models/vikingroom/leftwall copy.obj", camera.getLights());
+    Model model("../models/veach-mis/veach-mis.obj", camera.getLights());
     std::cout << "Scene lights: " << model.getLights().size() << std::endl;
     Scene scene(model.getTriangles(), model.getMaterials(), model.getLights());
     Renderer renderer(camera, scene);

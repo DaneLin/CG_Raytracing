@@ -33,6 +33,12 @@ namespace arc
         return (std::fabs(vec[0]) < eps && std::fabs(vec[1]) < eps && std::fabs(vec[2]) < eps);
     }
 
+    static glm::vec3 randomUnitVector()
+    {
+        glm::vec3 vec = glm::vec3{ randomDouble(),randomDouble() ,randomDouble() };
+        return glm::normalize(vec);
+    }
+
     static glm::vec3 randomInUniformSphere()
     {
         // rejection method
