@@ -9,7 +9,7 @@
 #include <functional>
 #include <cstring>
 
-const std::string bathTexturesPath = "../models/bathroom/textures";
+const std::string bathTexturesPath = "../models/bathroom/";
 
 Model::Model(const std::string &modelPath, const std::vector<glm::vec3> &radiances)
 {
@@ -77,17 +77,17 @@ void Model::loadModel(const std::string &modelPath, const std::vector<glm::vec3>
                 materials[i] = std::make_shared<Metal>(kd, 100.f / mats[i].shininess);
                 std::cout << "made a Metal material!" << '\n';
             }
-            else if (mats[i].diffuse_texname != "")
-            {
-                materials[i] = std::make_shared<LambertianTextured>(std::make_shared<Texture>(bathTexturesPath + mats[i].diffuse_texname));
-                std::cout << "made a Lambertian material with texture!" << '\n';
-            }
             else
             {
                 materials[i] = std::make_shared<Lambertian>(kd);
                 std::cout << "made a solid color material!" << '\n';
             }
         }
+		else
+		{
+			materials[i] = std::make_shared<LambertianTextured>(std::make_shared<Texture>(bathTexturesPath + mats[i].diffuse_texname));
+			std::cout << "made a Lambertian material with texture!" << '\n';
+		}
     }
 
     // loop over shapes

@@ -17,14 +17,14 @@
 int main(int, char **)
 {
     std::srand((unsigned int)std::time(nullptr));
-    Camera camera("../models/veach-mis/veach-mis.xml");
-    camera.setSamplePerPixel(1000);
+    Camera camera("../models/bathroom/bathroom.xml");
+    camera.setSamplePerPixel(4);
 
-    Model model("../models/veach-mis/veach-mis.obj", camera.getLights());
+    Model model("../models/bathroom/bathroom.obj", camera.getLights());
     std::cout << "Scene lights: " << model.getLights().size() << std::endl;
     Scene scene(model.getTriangles(), model.getMaterials(), model.getLights());
     Renderer renderer(camera, scene);
-    renderer.setBoudingTime(10);
+    renderer.setBoudingTime(1);
     renderer.render();
 
     return 0;
