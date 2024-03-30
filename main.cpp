@@ -26,6 +26,5 @@ int main(int, char **)
     Renderer renderer(camera, scene);
     renderer.setBoudingTime(1);
     renderer.render();
-
     return 0;
 }

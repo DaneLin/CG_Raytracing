@@ -28,23 +28,23 @@ namespace arc
         return min + (max - min) * randomDouble();
     }
 
-    inline bool isNearZero(const glm::vec3 &vec)
+    inline bool isNearZero(const glm::dvec3 &vec)
     {
         return (std::fabs(vec[0]) < eps && std::fabs(vec[1]) < eps && std::fabs(vec[2]) < eps);
     }
 
-    static glm::vec3 randomUnitVector()
+    static glm::dvec3 randomUnitVector()
     {
-        glm::vec3 vec = glm::vec3{ randomDouble(),randomDouble() ,randomDouble() };
+        glm::dvec3 vec = glm::dvec3{randomDouble(), randomDouble(), randomDouble()};
         return glm::normalize(vec);
     }
 
-    static glm::vec3 randomInUniformSphere()
+    static glm::dvec3 randomInUniformSphere()
     {
         // rejection method
         while (true)
         {
-            glm::vec3 randomDirection = {randomDouble(-1, 1), randomDouble(-1, 1), randomDouble(-1, 1)};
+            glm::dvec3 randomDirection = {randomDouble(-1, 1), randomDouble(-1, 1), randomDouble(-1, 1)};
             if (glm::dot(randomDirection, randomDirection) <= 1.f)
             {
                 return glm::normalize(randomDirection);
@@ -52,11 +52,11 @@ namespace arc
         }
     }
 
-    static glm::vec3 randomInHemisphere(const glm::vec3 &normal)
+    static glm::dvec3 randomInHemisphere(const glm::dvec3 &normal)
     {
         while (true)
         {
-            glm::vec3 randomDirection = randomInUniformSphere();
+            glm::dvec3 randomDirection = randomInUniformSphere();
             float result = glm::dot(normal, randomDirection);
             if (result > 0.f)
             {

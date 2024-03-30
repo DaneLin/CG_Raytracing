@@ -14,8 +14,8 @@
 
 struct Vertex
 {
-    glm::vec3 position{};
-    glm::vec3 normal{};
+    glm::dvec3 position{};
+    glm::dvec3 normal{};
     glm::vec2 uv{};
     bool operator==(const Vertex &v) const
     {
@@ -28,7 +28,7 @@ struct Vertex
 class Model
 {
 public:
-    Model(const std::string &modelPath, const std::vector<glm::vec3> &radiances);
+    Model(const std::string &modelPath, const std::vector<glm::dvec3> &radiances);
 
     ~Model() = default;
     std::vector<Triangle> &getTriangles();
@@ -36,7 +36,7 @@ public:
     std::vector<Triangle> &getLights() { return lights; }
 
 private:
-    void loadModel(const std::string &modelPath, const std::vector<glm::vec3> &radiances);
+    void loadModel(const std::string &modelPath, const std::vector<glm::dvec3> &radiances);
 
 private:
     std::vector<Triangle> triangles;

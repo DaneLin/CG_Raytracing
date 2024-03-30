@@ -7,12 +7,12 @@ class Ray
 {
 public:
     Ray() = default;
-    Ray(const glm::vec3 &origin, const glm::vec3 &direction)
+    Ray(const glm::dvec3 &origin, const glm::dvec3 &direction)
         : origin(origin), direction(direction)
     {
     }
 
-    glm::vec3 origin{};
-    glm::vec3 direction{};
+    glm::dvec3 origin{};
+    glm::dvec3 direction{};
 };
 #endif // __RAY_H__

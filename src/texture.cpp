@@ -25,7 +25,7 @@ Texture::~Texture()
         STBI_FREE(imageData);
 }
 
-glm::vec3 Texture::sample(double u, double v)
+glm::dvec3 Texture::sample(double u, double v)
 {
     // default value for sampling and debugging
     if (imageData == nullptr)
@@ -38,7 +38,7 @@ glm::vec3 Texture::sample(double u, double v)
     int y = static_cast<int>(v * imageHeight);
     auto result = pixelData(u, v);
     auto scale = 1.f / 255.f;
-    return glm::vec3(scale * result[0], scale * result[1], scale * result[2]);
+    return glm::dvec3(scale * result[0], scale * result[1], scale * result[2]);
 }
 
 const unsigned char *Texture::pixelData(int x, int y)

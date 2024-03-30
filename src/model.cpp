@@ -11,12 +11,12 @@
 
 const std::string bathTexturesPath = "../models/bathroom/";
 
-Model::Model(const std::string &modelPath, const std::vector<glm::vec3> &radiances)
+Model::Model(const std::string &modelPath, const std::vector<glm::dvec3> &radiances)
 {
     loadModel(modelPath, radiances);
 }
 
-void Model::loadModel(const std::string &modelPath, const std::vector<glm::vec3> &radiances)
+void Model::loadModel(const std::string &modelPath, const std::vector<glm::dvec3> &radiances)
 {
     // 使用tinyobjloader提供的读取模板
     tinyobj::ObjReaderConfig readerConfig;
@@ -51,7 +51,7 @@ void Model::loadModel(const std::string &modelPath, const std::vector<glm::vec3>
         std::cout << "  diffuse color: " << mats[i].diffuse[0] << ' '
                   << mats[i].diffuse[1] << ' '
                   << mats[i].diffuse[2] << std::endl;
-        glm::vec3 kd = {mats[i].diffuse[0], mats[i].diffuse[1], mats[i].diffuse[2]};
+        glm::dvec3 kd = {mats[i].diffuse[0], mats[i].diffuse[1], mats[i].diffuse[2]};
         // solid color
         if (mats[i].diffuse_texname.length() == 0)
         {
@@ -71,10 +71,15 @@ void Model::loadModel(const std::string &modelPath, const std::vector<glm::vec3>
                 materials[i] = std::make_shared<Mirror>();
                 std::cout << "made a Mirorr material!" << '\n';
             }
+            else if (std::strncmp(mats[i].name.c_str(), "BulbGlass", 9) == 0)
+            {
+                materials[i] = std::make_shared<Glass>(1.5);
+                std::cout << "made a Glass material!" << '\n';
+            }
             else if (mats[i].specular[0] != 0)
             {
                 // std::cout << "Shininess: " << mats[i].shininess << '\n';
-                materials[i] = std::make_shared<Metal>(kd, 100.f / mats[i].shininess);
+                materials[i] = std::make_shared<Metal>(kd, 15.f / mats[i].shininess);
                 std::cout << "made a Metal material!" << '\n';
             }
             else
@@ -83,11 +88,11 @@ void Model::loadModel(const std::string &modelPath, const std::vector<glm::vec3>
                 std::cout << "made a solid color material!" << '\n';
             }
         }
-		else
-		{
-			materials[i] = std::make_shared<LambertianTextured>(std::make_shared<Texture>(bathTexturesPath + mats[i].diffuse_texname));
-			std::cout << "made a Lambertian material with texture!" << '\n';
-		}
+        else
+        {
+            materials[i] = std::make_shared<LambertianTextured>(std::make_shared<Texture>(bathTexturesPath + mats[i].diffuse_texname));
+            std::cout << "made a Lambertian material with texture!" << '\n';
+        }
     }
 
     // loop over shapes

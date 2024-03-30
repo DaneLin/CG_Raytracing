@@ -67,7 +67,7 @@ Camera::Camera(const std::string &filepath)
     {
         const char *mtlname = pLight->Attribute("mtlname");
         const char *radiance = pLight->Attribute("radiance");
-        glm::vec3 tmp{};
+        glm::dvec3 tmp{};
         std::stringstream ss(radiance);
         char delim;
         ss >> tmp.x >> delim >> tmp.y >> delim >> tmp.z;
@@ -79,12 +79,12 @@ Camera::Camera(const std::string &filepath)
     initialize();
 }
 
-std::vector<glm::vec3> Camera::getLights() const
+std::vector<glm::dvec3> Camera::getLights() const
 {
     return lights;
 }
 
-void Camera::setViewTarget(glm::vec3 cameraPosition, glm::vec3 targetCenter, glm::vec3 upDiection)
+void Camera::setViewTarget(glm::dvec3 cameraPosition, glm::dvec3 targetCenter, glm::dvec3 upDiection)
 {
     position = cameraPosition;
     lookAt = targetCenter;
@@ -94,37 +94,37 @@ void Camera::setViewTarget(glm::vec3 cameraPosition, glm::vec3 targetCenter, glm
 
 void Camera::initialize()
 {
-    float radianAngle = glm::radians(fvoy);
-    float height = glm::tan(radianAngle / 2);
+    double radianAngle = glm::radians(fvoy);
+    double height = glm::tan(radianAngle / 2);
 
-    float projectionHeight = height * 2.f * focusDis;
-    float projectionWidth = projectionHeight * ((float)imageWidth / (float)imageHeight);
+    double projectionHeight = height * 2. * focusDis;
+    double projectionWidth = projectionHeight * ((double)imageWidth / (double)imageHeight);
 
     auto w = glm::normalize(position - lookAt);
     auto u = glm::normalize(glm::cross(upDirection, w));
     auto v = glm::cross(w, u);
 
-    glm::vec3 u_ = projectionWidth * u;
-    glm::vec3 v_ = projectionHeight * -v;
+    glm::dvec3 u_ = projectionWidth * u;
+    glm::dvec3 v_ = projectionHeight * -v;
 
-    delta_u = u_ / (float)imageWidth;
-    delta_v = v_ / (float)imageHeight;
+    delta_u = u_ / (double)imageWidth;
+    delta_v = v_ / (double)imageHeight;
 
-    pixelZeroLoc = position - (focusDis * w) - u_ / 2.f - v_ / 2.f;
-    pixelZeroLoc += 0.5f * (delta_u + delta_v);
+    pixelZeroLoc = position - (focusDis * w) - u_ / 2. - v_ / 2.;
+    pixelZeroLoc += 0.5 * (delta_u + delta_v);
 }
 
 Ray Camera::getRay(uint32_t i, uint32_t j)
 {
-    glm::vec3 center = pixelZeroLoc + ((float)i * delta_u) + ((float)j * delta_v);
-    glm::vec3 sampleCenter = center + uniformSampleSquare();
+    glm::dvec3 center = pixelZeroLoc + ((double)i * delta_u) + ((double)j * delta_v);
+    glm::dvec3 sampleCenter = center + uniformSampleSquare();
 
     return Ray(position, sampleCenter - position);
 }
 
-glm::vec3 Camera::uniformSampleSquare()
+glm::dvec3 Camera::uniformSampleSquare()
 {
-    float px = -0.5 + arc::randomDouble();
-    float py = -0.5 + arc::randomDouble();
+    double px = -0.5 + arc::randomDouble();
+    double py = -0.5 + arc::randomDouble();
     return px * delta_u + py * delta_v;
 }

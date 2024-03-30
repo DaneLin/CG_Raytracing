@@ -24,13 +24,13 @@ public:
 private:
     void setup();
     void generateImage();
-    glm::vec3 convertToRGB(const glm::vec3 &color);
-    glm::vec3 pixelResult(uint32_t x, uint32_t y);
-    glm::vec3 traceRay(const Ray &ray, int depth);
+    glm::dvec3 convertToRGB(const glm::dvec3 &color);
+    glm::dvec3 pixelResult(uint32_t x, uint32_t y);
+    glm::dvec3 traceRay(const Ray &ray, int depth);
 
 private:
     uint32_t m_ImageWidth, m_ImageHeight;
-    std::vector<glm::vec3> m_PixelData{};
+    std::vector<glm::dvec3> m_PixelData{};
     uint32_t boundTime = 5;
     const BVHNode *node = nullptr;
 

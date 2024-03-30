@@ -12,7 +12,7 @@ class Texture
 public:
     Texture(const std::string &imagePath);
     ~Texture();
-    glm::vec3 sample(double u, double v);
+    glm::dvec3 sample(double u, double v);
 
     // setter
     void setPerPixelByte(int pbb) { perPixelByte = pbb; }
@@ -30,7 +30,7 @@ private:
     int perLine;
     unsigned char *imageData = nullptr;
     // default color for debugging.
-    glm::vec3 albedo{1, 0, 1};
+    glm::dvec3 albedo{1, 0, 1};
 };
 
 #endif
